@@ -41,32 +41,22 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var sdk_1 = require("@looker/sdk");
 var express_1 = __importDefault(require("express"));
-// import ejs from "ejs";
 var path_1 = __importDefault(require("path"));
-var host = 'localhost';
-var port = 3000;
-// import express from "express"
-// import { Response } from "express";
-// Create a new express app instance
 var app = express_1.default();
 app.set('views', path_1.default.join(__dirname, '../views'));
 app.engine('html', require('ejs').renderFile);
-function foo() {
+function getLook(lookId) {
     return __awaiter(this, void 0, void 0, function () {
         var sdk, data;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     sdk = sdk_1.LookerNodeSDK.init31();
-                    return [4 /*yield*/, sdk.ok(sdk.run_look({ result_format: 'json', look_id: 22 }))
-                        // make any other calls to the Looker SDK
-                    ];
+                    return [4 /*yield*/, sdk.ok(sdk.run_look({ result_format: 'json', look_id: lookId }))];
                 case 1:
                     data = _a.sent();
-                    // make any other calls to the Looker SDK
                     return [4 /*yield*/, sdk.authSession.logout()];
                 case 2:
-                    // make any other calls to the Looker SDK
                     _a.sent();
                     if (!sdk.authSession.isAuthenticated()) {
                         console.log('Logout successful');
@@ -78,12 +68,9 @@ function foo() {
 }
 app.get("/", function (req, res) {
     res.statusCode = 200;
-    // response.setHeader('Content-Type', 'text/plain');
-    var data = foo();
-    // foo().then(s => res.end(s))
-    foo().then(function (s) { return res.render('index.ejs', { message: s }); });
+    // set your lookId below
+    getLook(22).then(function (s) { return res.render('index.ejs', { message: s }); });
 });
 app.listen(3000, function () {
-    // tslint:disable-next-line:no-console
     console.log("App is listening on port 3000!");
 });
