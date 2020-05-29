@@ -42,9 +42,28 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var sdk_1 = require("@looker/sdk");
 var express_1 = __importDefault(require("express"));
 var path_1 = __importDefault(require("path"));
+var cors_1 = __importDefault(require("cors"));
 var app = express_1.default();
-app.set('views', path_1.default.join(__dirname, '../views'));
-app.engine('html', require('ejs').renderFile);
+app.set("views", path_1.default.join(__dirname, "../views"));
+app.engine("html", require("ejs").renderFile);
+var options = {
+    allowedHeaders: [
+        "Origin",
+        "X-Requested-With",
+        "Content-Type",
+        "Accept",
+        "X-Access-Token",
+    ],
+    credentials: true,
+    methods: "GET",
+    origin: "http://localhost:3000",
+    preflightContinue: false,
+};
+//use cors middleware
+app.use(cors_1.default(options));
+//add your routes
+//enable pre-flight
+app.options("*", cors_1.default(options));
 function getLook(lookId) {
     return __awaiter(this, void 0, void 0, function () {
         var sdk, data;
@@ -52,24 +71,24 @@ function getLook(lookId) {
             switch (_a.label) {
                 case 0:
                     sdk = sdk_1.LookerNodeSDK.init31();
-                    return [4 /*yield*/, sdk.ok(sdk.run_look({ result_format: 'json', look_id: lookId }))];
+                    return [4 /*yield*/, sdk.ok(sdk.run_look({ result_format: "json", look_id: lookId }))];
                 case 1:
                     data = _a.sent();
                     return [4 /*yield*/, sdk.authSession.logout()];
                 case 2:
                     _a.sent();
-                    if (!sdk.authSession.isAuthenticated()) {
-                        console.log('Logout successful');
-                    }
                     return [2 /*return*/, JSON.stringify(data)];
             }
         });
     });
 }
-app.get("/", function (req, res) {
+app.get("/data", function (req, res) {
     res.statusCode = 200;
     // set your lookId below
-    getLook(22).then(function (s) { return res.render('index.ejs', { message: s }); });
+    getLook(22).then(function (s) { return res.end(s); });
+});
+app.get("/", function (req, res) {
+    res.render("index.html");
 });
 app.listen(3000, function () {
     console.log("App is listening on port 3000!");
